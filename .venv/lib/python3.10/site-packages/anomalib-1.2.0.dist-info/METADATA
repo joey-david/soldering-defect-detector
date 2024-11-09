@@ -1,0 +1,592 @@
+Metadata-Version: 2.1
+Name: anomalib
+Version: 1.2.0
+Summary: anomalib - Anomaly Detection Library
+Author: Intel OpenVINO
+License: 
+                                         Apache License
+                                   Version 2.0, January 2004
+                                http://www.apache.org/licenses/
+        
+           TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+        
+           1. Definitions.
+        
+              "License" shall mean the terms and conditions for use, reproduction,
+              and distribution as defined by Sections 1 through 9 of this document.
+        
+              "Licensor" shall mean the copyright owner or entity authorized by
+              the copyright owner that is granting the License.
+        
+              "Legal Entity" shall mean the union of the acting entity and all
+              other entities that control, are controlled by, or are under common
+              control with that entity. For the purposes of this definition,
+              "control" means (i) the power, direct or indirect, to cause the
+              direction or management of such entity, whether by contract or
+              otherwise, or (ii) ownership of fifty percent (50%) or more of the
+              outstanding shares, or (iii) beneficial ownership of such entity.
+        
+              "You" (or "Your") shall mean an individual or Legal Entity
+              exercising permissions granted by this License.
+        
+              "Source" form shall mean the preferred form for making modifications,
+              including but not limited to software source code, documentation
+              source, and configuration files.
+        
+              "Object" form shall mean any form resulting from mechanical
+              transformation or translation of a Source form, including but
+              not limited to compiled object code, generated documentation,
+              and conversions to other media types.
+        
+              "Work" shall mean the work of authorship, whether in Source or
+              Object form, made available under the License, as indicated by a
+              copyright notice that is included in or attached to the work
+              (an example is provided in the Appendix below).
+        
+              "Derivative Works" shall mean any work, whether in Source or Object
+              form, that is based on (or derived from) the Work and for which the
+              editorial revisions, annotations, elaborations, or other modifications
+              represent, as a whole, an original work of authorship. For the purposes
+              of this License, Derivative Works shall not include works that remain
+              separable from, or merely link (or bind by name) to the interfaces of,
+              the Work and Derivative Works thereof.
+        
+              "Contribution" shall mean any work of authorship, including
+              the original version of the Work and any modifications or additions
+              to that Work or Derivative Works thereof, that is intentionally
+              submitted to Licensor for inclusion in the Work by the copyright owner
+              or by an individual or Legal Entity authorized to submit on behalf of
+              the copyright owner. For the purposes of this definition, "submitted"
+              means any form of electronic, verbal, or written communication sent
+              to the Licensor or its representatives, including but not limited to
+              communication on electronic mailing lists, source code control systems,
+              and issue tracking systems that are managed by, or on behalf of, the
+              Licensor for the purpose of discussing and improving the Work, but
+              excluding communication that is conspicuously marked or otherwise
+              designated in writing by the copyright owner as "Not a Contribution."
+        
+              "Contributor" shall mean Licensor and any individual or Legal Entity
+              on behalf of whom a Contribution has been received by Licensor and
+              subsequently incorporated within the Work.
+        
+           2. Grant of Copyright License. Subject to the terms and conditions of
+              this License, each Contributor hereby grants to You a perpetual,
+              worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+              copyright license to reproduce, prepare Derivative Works of,
+              publicly display, publicly perform, sublicense, and distribute the
+              Work and such Derivative Works in Source or Object form.
+        
+           3. Grant of Patent License. Subject to the terms and conditions of
+              this License, each Contributor hereby grants to You a perpetual,
+              worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+              (except as stated in this section) patent license to make, have made,
+              use, offer to sell, sell, import, and otherwise transfer the Work,
+              where such license applies only to those patent claims licensable
+              by such Contributor that are necessarily infringed by their
+              Contribution(s) alone or by combination of their Contribution(s)
+              with the Work to which such Contribution(s) was submitted. If You
+              institute patent litigation against any entity (including a
+              cross-claim or counterclaim in a lawsuit) alleging that the Work
+              or a Contribution incorporated within the Work constitutes direct
+              or contributory patent infringement, then any patent licenses
+              granted to You under this License for that Work shall terminate
+              as of the date such litigation is filed.
+        
+           4. Redistribution. You may reproduce and distribute copies of the
+              Work or Derivative Works thereof in any medium, with or without
+              modifications, and in Source or Object form, provided that You
+              meet the following conditions:
+        
+              (a) You must give any other recipients of the Work or
+                  Derivative Works a copy of this License; and
+        
+              (b) You must cause any modified files to carry prominent notices
+                  stating that You changed the files; and
+        
+              (c) You must retain, in the Source form of any Derivative Works
+                  that You distribute, all copyright, patent, trademark, and
+                  attribution notices from the Source form of the Work,
+                  excluding those notices that do not pertain to any part of
+                  the Derivative Works; and
+        
+              (d) If the Work includes a "NOTICE" text file as part of its
+                  distribution, then any Derivative Works that You distribute must
+                  include a readable copy of the attribution notices contained
+                  within such NOTICE file, excluding those notices that do not
+                  pertain to any part of the Derivative Works, in at least one
+                  of the following places: within a NOTICE text file distributed
+                  as part of the Derivative Works; within the Source form or
+                  documentation, if provided along with the Derivative Works; or,
+                  within a display generated by the Derivative Works, if and
+                  wherever such third-party notices normally appear. The contents
+                  of the NOTICE file are for informational purposes only and
+                  do not modify the License. You may add Your own attribution
+                  notices within Derivative Works that You distribute, alongside
+                  or as an addendum to the NOTICE text from the Work, provided
+                  that such additional attribution notices cannot be construed
+                  as modifying the License.
+        
+              You may add Your own copyright statement to Your modifications and
+              may provide additional or different license terms and conditions
+              for use, reproduction, or distribution of Your modifications, or
+              for any such Derivative Works as a whole, provided Your use,
+              reproduction, and distribution of the Work otherwise complies with
+              the conditions stated in this License.
+        
+           5. Submission of Contributions. Unless You explicitly state otherwise,
+              any Contribution intentionally submitted for inclusion in the Work
+              by You to the Licensor shall be under the terms and conditions of
+              this License, without any additional terms or conditions.
+              Notwithstanding the above, nothing herein shall supersede or modify
+              the terms of any separate license agreement you may have executed
+              with Licensor regarding such Contributions.
+        
+           6. Trademarks. This License does not grant permission to use the trade
+              names, trademarks, service marks, or product names of the Licensor,
+              except as required for reasonable and customary use in describing the
+              origin of the Work and reproducing the content of the NOTICE file.
+        
+           7. Disclaimer of Warranty. Unless required by applicable law or
+              agreed to in writing, Licensor provides the Work (and each
+              Contributor provides its Contributions) on an "AS IS" BASIS,
+              WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+              implied, including, without limitation, any warranties or conditions
+              of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+              PARTICULAR PURPOSE. You are solely responsible for determining the
+              appropriateness of using or redistributing the Work and assume any
+              risks associated with Your exercise of permissions under this License.
+        
+           8. Limitation of Liability. In no event and under no legal theory,
+              whether in tort (including negligence), contract, or otherwise,
+              unless required by applicable law (such as deliberate and grossly
+              negligent acts) or agreed to in writing, shall any Contributor be
+              liable to You for damages, including any direct, indirect, special,
+              incidental, or consequential damages of any character arising as a
+              result of this License or out of the use or inability to use the
+              Work (including but not limited to damages for loss of goodwill,
+              work stoppage, computer failure or malfunction, or any and all
+              other commercial damages or losses), even if such Contributor
+              has been advised of the possibility of such damages.
+        
+           9. Accepting Warranty or Additional Liability. While redistributing
+              the Work or Derivative Works thereof, You may choose to offer,
+              and charge a fee for, acceptance of support, warranty, indemnity,
+              or other liability obligations and/or rights consistent with this
+              License. However, in accepting such obligations, You may act only
+              on Your own behalf and on Your sole responsibility, not on behalf
+              of any other Contributor, and only if You agree to indemnify,
+              defend, and hold each Contributor harmless for any liability
+              incurred by, or claims asserted against, such Contributor by reason
+              of your accepting any such warranty or additional liability.
+        
+           END OF TERMS AND CONDITIONS
+        
+           APPENDIX: How to apply the Apache License to your work.
+        
+              To apply the Apache License to your work, attach the following
+              boilerplate notice, with the fields enclosed by brackets "[]"
+              replaced with your own identifying information. (Don't include
+              the brackets!)  The text should be enclosed in the appropriate
+              comment syntax for the file format. We also recommend that a
+              file or class name and description of purpose be included on the
+              same "printed page" as the copyright notice for easier
+              identification within third-party archives.
+        
+           Copyright (C) 2020-2021 Intel Corporation
+        
+           Licensed under the Apache License, Version 2.0 (the "License");
+           you may not use this file except in compliance with the License.
+           You may obtain a copy of the License at
+        
+               http://www.apache.org/licenses/LICENSE-2.0
+        
+           Unless required by applicable law or agreed to in writing, software
+           distributed under the License is distributed on an "AS IS" BASIS,
+           WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+           See the License for the specific language governing permissions and
+           limitations under the License.
+        
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: omegaconf>=2.1.1
+Requires-Dist: rich>=13.5.2
+Requires-Dist: jsonargparse[signatures]>=4.27.7
+Requires-Dist: docstring-parser
+Requires-Dist: rich-argparse
+Requires-Dist: lightning-utilities
+Provides-Extra: core
+Requires-Dist: av>=10.0.0; extra == "core"
+Requires-Dist: einops>=0.3.2; extra == "core"
+Requires-Dist: freia>=0.2; extra == "core"
+Requires-Dist: imgaug==0.4.0; extra == "core"
+Requires-Dist: kornia>=0.6.6; extra == "core"
+Requires-Dist: matplotlib>=3.4.3; extra == "core"
+Requires-Dist: opencv-python>=4.5.3.56; extra == "core"
+Requires-Dist: pandas>=1.1.0; extra == "core"
+Requires-Dist: timm; extra == "core"
+Requires-Dist: lightning>=2.2; extra == "core"
+Requires-Dist: torch>=2; extra == "core"
+Requires-Dist: torchmetrics>=1.3.2; extra == "core"
+Requires-Dist: open-clip-torch<2.26.1,>=2.23.0; extra == "core"
+Provides-Extra: dev
+Requires-Dist: anomalib[docs,full,test]; extra == "dev"
+Provides-Extra: docs
+Requires-Dist: myst-parser; extra == "docs"
+Requires-Dist: nbsphinx; extra == "docs"
+Requires-Dist: pandoc; extra == "docs"
+Requires-Dist: sphinx; extra == "docs"
+Requires-Dist: sphinx-autodoc-typehints; extra == "docs"
+Requires-Dist: sphinx-book-theme; extra == "docs"
+Requires-Dist: sphinx-copybutton; extra == "docs"
+Requires-Dist: sphinx-design; extra == "docs"
+Provides-Extra: full
+Requires-Dist: anomalib[core,loggers,notebooks,openvino,vlm]; extra == "full"
+Provides-Extra: loggers
+Requires-Dist: comet-ml>=3.31.7; extra == "loggers"
+Requires-Dist: gradio>=4; extra == "loggers"
+Requires-Dist: tensorboard; extra == "loggers"
+Requires-Dist: wandb<=0.15.9,>=0.12.17; extra == "loggers"
+Requires-Dist: mlflow>=1.0.0; extra == "loggers"
+Provides-Extra: notebooks
+Requires-Dist: gitpython; extra == "notebooks"
+Requires-Dist: ipykernel; extra == "notebooks"
+Requires-Dist: ipywidgets; extra == "notebooks"
+Requires-Dist: notebook; extra == "notebooks"
+Provides-Extra: openvino
+Requires-Dist: openvino>=2024.0; extra == "openvino"
+Requires-Dist: nncf>=2.10.0; extra == "openvino"
+Requires-Dist: onnx>=1.16.0; extra == "openvino"
+Provides-Extra: test
+Requires-Dist: pre-commit; extra == "test"
+Requires-Dist: pytest; extra == "test"
+Requires-Dist: pytest-cov; extra == "test"
+Requires-Dist: pytest-xdist; extra == "test"
+Requires-Dist: pytest-mock; extra == "test"
+Requires-Dist: pytest-sugar; extra == "test"
+Requires-Dist: coverage[toml]; extra == "test"
+Requires-Dist: tox; extra == "test"
+Provides-Extra: vlm
+Requires-Dist: ollama; extra == "vlm"
+Requires-Dist: openai; extra == "vlm"
+Requires-Dist: python-dotenv; extra == "vlm"
+Requires-Dist: transformers; extra == "vlm"
+
+<div align="center">
+
+<img src="https://raw.githubusercontent.com/openvinotoolkit/anomalib/main/docs/source/_static/images/logos/anomalib-wide-blue.png" width="600px" alt="Anomalib Logo">
+
+**A library for benchmarking, developing and deploying deep learning anomaly detection algorithms**
+
+---
+
+[Key Features](#key-features) •
+[Docs](https://anomalib.readthedocs.io/en/latest/) •
+[Notebooks](notebooks) •
+[License](LICENSE)
+
+[![python](https://img.shields.io/badge/python-3.7%2B-green)]()
+[![pytorch](https://img.shields.io/badge/pytorch-1.8.1%2B-orange)]()
+[![openvino](https://img.shields.io/badge/openvino-2022.3.0-purple)]()
+
+[![Pre-Merge Checks](https://github.com/openvinotoolkit/anomalib/actions/workflows/pre_merge.yml/badge.svg)](https://github.com/openvinotoolkit/anomalib/actions/workflows/pre_merge.yml)
+[![Documentation Status](https://readthedocs.org/projects/anomalib/badge/?version=latest)](https://anomalib.readthedocs.io/en/latest/?badge=latest)
+[![codecov](https://codecov.io/gh/openvinotoolkit/anomalib/branch/main/graph/badge.svg?token=Z6A07N1BZK)](https://codecov.io/gh/openvinotoolkit/anomalib)
+[![Downloads](https://static.pepy.tech/personalized-badge/anomalib?period=total&units=international_system&left_color=grey&right_color=green&left_text=PyPI%20Downloads)](https://pepy.tech/project/anomalib)
+[![Discord](https://img.shields.io/discord/1230798452577800237?style=plastic)](https://discord.com/channels/1230798452577800237)
+
+</div>
+
+---
+
+# 👋 Introduction
+
+Anomalib is a deep learning library that aims to collect state-of-the-art anomaly detection algorithms for benchmarking on both public and private datasets. Anomalib provides several ready-to-use implementations of anomaly detection algorithms described in the recent literature, as well as a set of tools that facilitate the development and implementation of custom models. The library has a strong focus on visual anomaly detection, where the goal of the algorithm is to detect and/or localize anomalies within images or videos in a dataset. Anomalib is constantly updated with new algorithms and training/inference extensions, so keep checking!
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/openvinotoolkit/anomalib/main/docs/source/_static/images/readme.png" width="1000" alt="A prediction made by anomalib">
+</p>
+
+## Key features
+
+- Simple and modular API and CLI for training, inference, benchmarking, and hyperparameter optimization.
+- The largest public collection of ready-to-use deep learning anomaly detection algorithms and benchmark datasets.
+- [**Lightning**](https://www.lightning.ai/) based model implementations to reduce boilerplate code and limit the implementation efforts to the bare essentials.
+- The majority of models can be exported to [**OpenVINO**](https://www.intel.com/content/www/us/en/developer/tools/openvino-toolkit/overview.html) Intermediate Representation (IR) for accelerated inference on Intel hardware.
+- A set of [inference tools](tools) for quick and easy deployment of the standard or custom anomaly detection models.
+
+# 📦 Installation
+
+Anomalib provides two ways to install the library. The first is through PyPI, and the second is through a local installation. PyPI installation is recommended if you want to use the library without making any changes to the source code. If you want to make changes to the library, then a local installation is recommended.
+
+<details>
+<summary>Install from PyPI</summary>
+Installing the library with pip is the easiest way to get started with anomalib.
+
+```bash
+pip install anomalib
+```
+
+This will install Anomalib CLI using the [dependencies](/pyproject.toml) in the `pyproject.toml` file. Anomalib CLI is a command line interface for training, inference, benchmarking, and hyperparameter optimization. If you want to use the library as a Python package, you can install the library with the following command:
+
+```bash
+# Get help for the installation arguments
+anomalib install -h
+
+# Install the full package
+anomalib install
+
+# Install with verbose output
+anomalib install -v
+
+# Install the core package option only to train and evaluate models via Torch and Lightning
+anomalib install --option core
+
+# Install with OpenVINO option only. This is useful for edge deployment as the wheel size is smaller.
+anomalib install --option openvino
+```
+
+</details>
+
+<details>
+<summary>Install from source</summary>
+To install from source, you need to clone the repository and install the library using pip via editable mode.
+
+```bash
+# Use of virtual environment is highly recommended
+# Using conda
+yes | conda create -n anomalib_env python=3.10
+conda activate anomalib_env
+
+# Or using your favorite virtual environment
+# ...
+
+# Clone the repository and install in editable mode
+git clone https://github.com/openvinotoolkit/anomalib.git
+cd anomalib
+pip install -e .
+```
+
+This will install Anomalib CLI using the [dependencies](/pyproject.toml) in the `pyproject.toml` file. Anomalib CLI is a command line interface for training, inference, benchmarking, and hyperparameter optimization. If you want to use the library as a Python package, you can install the library with the following command:
+
+```bash
+# Get help for the installation arguments
+anomalib install -h
+
+# Install the full package
+anomalib install
+
+# Install with verbose output
+anomalib install -v
+
+# Install the core package option only to train and evaluate models via Torch and Lightning
+anomalib install --option core
+
+# Install with OpenVINO option only. This is useful for edge deployment as the wheel size is smaller.
+anomalib install --option openvino
+```
+
+</details>
+
+# 🧠 Training
+
+Anomalib supports both API and CLI-based training. The API is more flexible and allows for more customization, while the CLI training utilizes command line interfaces, and might be easier for those who would like to use anomalib off-the-shelf.
+
+<details>
+<summary>Training via API</summary>
+
+```python
+# Import the required modules
+from anomalib.data import MVTec
+from anomalib.models import Patchcore
+from anomalib.engine import Engine
+
+# Initialize the datamodule, model and engine
+datamodule = MVTec()
+model = Patchcore()
+engine = Engine()
+
+# Train the model
+engine.fit(datamodule=datamodule, model=model)
+```
+
+</details>
+
+<details>
+<summary>Training via CLI</summary>
+
+```bash
+# Get help about the training arguments, run:
+anomalib train -h
+
+# Train by using the default values.
+anomalib train --model Patchcore --data anomalib.data.MVTec
+
+# Train by overriding arguments.
+anomalib train --model Patchcore --data anomalib.data.MVTec --data.category transistor
+
+# Train by using a config file.
+anomalib train --config <path/to/config>
+```
+
+</details>
+
+# 🤖 Inference
+
+Anomalib includes multiple inferencing scripts, including Torch, Lightning, Gradio, and OpenVINO inferencers to perform inference using the trained/exported model. Here we show an inference example using the Lightning inferencer. For other inferencers, please refer to the [Inference Documentation](https://anomalib.readthedocs.io).
+
+<details>
+<summary>Inference via API</summary>
+
+The following example demonstrates how to perform Lightning inference by loading a model from a checkpoint file.
+
+```python
+# Assuming the datamodule, model and engine is initialized from the previous step,
+# a prediction via a checkpoint file can be performed as follows:
+predictions = engine.predict(
+    datamodule=datamodule,
+    model=model,
+    ckpt_path="path/to/checkpoint.ckpt",
+)
+```
+
+</details>
+
+<details>
+<summary>Inference via CLI</summary>
+
+```bash
+# To get help about the arguments, run:
+anomalib predict -h
+
+# Predict by using the default values.
+anomalib predict --model anomalib.models.Patchcore \
+                 --data anomalib.data.MVTec \
+                 --ckpt_path <path/to/model.ckpt>
+
+# Predict by overriding arguments.
+anomalib predict --model anomalib.models.Patchcore \
+                 --data anomalib.data.MVTec \
+                 --ckpt_path <path/to/model.ckpt>
+                 --return_predictions
+
+# Predict by using a config file.
+anomalib predict --config <path/to/config> --return_predictions
+```
+
+</details>
+
+# ⚙️ Hyperparameter Optimization
+
+Anomalib supports hyperparameter optimization (HPO) using [wandb](https://wandb.ai/) and [comet.ml](https://www.comet.com/). For more details refer the [HPO Documentation](https://openvinotoolkit.github.io/anomalib/tutorials/hyperparameter_optimization.html)
+
+<details>
+<summary>HPO via API</summary>
+
+```python
+# To be enabled in v1.1
+```
+
+</details>
+
+<details>
+<summary>HPO via CLI</summary>
+
+The following example demonstrates how to perform HPO for the Patchcore model.
+
+```bash
+anomalib hpo --backend WANDB  --sweep_config tools/hpo/configs/wandb.yaml
+```
+
+</details>
+
+# 🧪 Experiment Management
+
+Anomalib is integrated with various libraries for experiment tracking such as Comet, tensorboard, and wandb through [pytorch lighting loggers](https://pytorch-lightning.readthedocs.io/en/stable/extensions/logging.html). For more information, refer to the [Logging Documentation](https://openvinotoolkit.github.io/anomalib/tutorials/logging.html)
+
+<details>
+<summary>Experiment Management via API</summary>
+
+```python
+# To be enabled in v1.1
+```
+
+</details>
+
+<details>
+<summary>Experiment Management via CLI</summary>
+
+Below is an example of how to enable logging for hyper-parameters, metrics, model graphs, and predictions on images in the test data-set.
+
+You first need to modify the `config.yaml` file to enable logging. The following example shows how to enable logging:
+
+```yaml
+# Place the experiment management config here.
+```
+
+```bash
+# Place the Experiment Management CLI command here.
+```
+
+</details>
+
+# 📊 Benchmarking
+
+Anomalib provides a benchmarking tool to evaluate the performance of the anomaly detection models on a given dataset. The benchmarking tool can be used to evaluate the performance of the models on a given dataset, or to compare the performance of multiple models on a given dataset.
+
+Each model in anomalib is benchmarked on a set of datasets, and the results are available in `src/anomalib/models/<type>/<model_name>/README.md`. For example, the MVTec AD results for the Patchcore model are available in the corresponding [README.md](src/anomalib/models/image/patchcore/README.md#mvtec-ad-dataset) file.
+
+<details>
+<summary>Benchmarking via API</summary>
+
+```python
+# To be enabled in v1.1
+```
+
+</details>
+
+<details>
+<summary>Benchmarking via CLI</summary>
+
+To run the benchmarking tool, run the following command:
+
+```bash
+anomalib benchmark --config tools/benchmarking/benchmark_params.yaml
+```
+
+</details>
+
+# ✍️ Reference
+
+If you use this library and love it, use this to cite it 🤗
+
+```tex
+@inproceedings{akcay2022anomalib,
+  title={Anomalib: A deep learning library for anomaly detection},
+  author={Akcay, Samet and Ameln, Dick and Vaidya, Ashwin and Lakshmanan, Barath and Ahuja, Nilesh and Genc, Utku},
+  booktitle={2022 IEEE International Conference on Image Processing (ICIP)},
+  pages={1706--1710},
+  year={2022},
+  organization={IEEE}
+}
+```
+
+# 👥 Contributing
+
+For those who would like to contribute to the library, see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+Thank you to all of the people who have already made a contribution - we appreciate your support!
+
+<a href="https://github.com/openvinotoolkit/anomalib/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=openvinotoolkit/anomalib" alt="Contributors to openvinotoolkit/anomalib" />
+</a>

@@ -1,0 +1,2 @@
+from anomalib import AnomalyDetector
+
