@@ -2,19 +2,21 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
-from torchvision.datasets import ImageFolder
-import matplotlib.pyplot as plt
-import numpy as np
-import os
 from PIL import Image
-from sklearn.metrics import roc_auc_score, roc_curve, confusion_matrix, ConfusionMatrixDisplay
-# Define transformations
-transform = transforms.Compose([
-    transforms.Resize((224, 224)),
-    transforms.ToTensor()
-])
+import os
+import matplotlib.pyplot as plt
+from sklearn.metrics import roc_auc_score, roc_curve, confusion_matrix, precision_score, recall_score, f1_score, ConfusionMatrixDisplay
+import numpy as np
+import time
 
-# Construction de notre dataset à partir du dossier dataset
+def get_transform():
+    return transforms.Compose([
+        transforms.Resize((256, 256)),
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomVerticalFlip(),
+        transforms.ToTensor()
+    ])
+
 class CustomDataset(Dataset):
     def __init__(self, root_dir, mode='train', transform=None):
         self.root_dir = root_dir
@@ -59,29 +61,21 @@ class CustomDataset(Dataset):
         else:
             return image, self.labels[idx]
 
-# Data loaders
-BS = 16
-train_dataset = CustomDataset(root_dir='dataset', mode='train', transform=transform)
-train_loader = DataLoader(train_dataset, batch_size=BS, shuffle=True)
-
-test_dataset = CustomDataset(root_dir='dataset', mode='test', transform=transform)
-test_loader = DataLoader(test_dataset, batch_size=BS, shuffle=False)
-
-# Define the autoencoder model
 class Autoencoder(nn.Module):
     def __init__(self):
         super(Autoencoder, self).__init__()
-        # Encoder
         self.encoder = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=4, stride=2, padding=1),
             nn.ReLU(),
+            nn.BatchNorm2d(64),
             nn.Conv2d(64, 128, kernel_size=4, stride=2, padding=1),
-            nn.ReLU()
+            nn.ReLU(),
+            nn.BatchNorm2d(128)
         )
-        # Decoder
         self.decoder = nn.Sequential(
             nn.ConvTranspose2d(128, 64, kernel_size=4, stride=2, padding=1),
             nn.ReLU(),
+            nn.BatchNorm2d(64),
             nn.ConvTranspose2d(64, 3, kernel_size=4, stride=2, padding=1),
             nn.ReLU()
         )
@@ -91,74 +85,111 @@ class Autoencoder(nn.Module):
         x = self.decoder(x)
         return x
 
-model = Autoencoder().cuda()
-criterion = torch.nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+def train_model(model, train_loader, criterion, optimizer, scheduler, num_epochs=50):
+    for epoch in range(num_epochs):
+        training_start = time.time()
+        model.train()
+        running_loss = 0.0
+        for data in train_loader:
+            data = data.cuda()
+            output = model(data)
+            loss = 100_000 * criterion(output, data)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            running_loss += loss.item() * data.size(0)
+        epoch_loss = running_loss / len(train_loader.dataset)
+        print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {epoch_loss:.4f}, Time since last epoch: {time.time() - training_start:.2f} seconds')
+        scheduler.step()
 
-# Training loop
-num_epochs = 100
-for epoch in range(num_epochs):
-    model.train()
-    for img in train_loader:
-        img = img.cuda()
-        output = model(img)
-        loss = 100_000*criterion(output, img)
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-    print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
+def evaluate_model(model, test_loader):
+    y_true = []
+    y_pred = []
+    y_score = []
+    model.eval()
+    with torch.no_grad():
+        for data, label in test_loader:
+            data = data.cuda()
+            recon = model(data)
+            y_score_batch = ((data - recon)**2).mean(axis=(1,2,3)).cpu().numpy()
+            y_pred_batch = (y_score_batch >= 0.5).astype(int)
+            y_true.extend(label.numpy().tolist())
+            y_pred.extend(y_pred_batch.tolist())
+            y_score.extend(y_score_batch.tolist())
+    return np.array(y_true), np.array(y_pred), np.array(y_score)
 
-# Evaluation on test set
-y_true = []
-y_pred = []
-y_score = []
-model.eval()
+def plot_roc_curve(y_true, y_score, auc_roc_score, learning_rate, num_epochs):
+    fpr, tpr, thresholds = roc_curve(y_true, y_score)
+    plt.figure()
+    plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % auc_roc_score)
+    plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('Receiver Operating Characteristic (ROC) Curve')
+    plt.legend(loc="lower right")
+    plt.savefig(f"roc_curve.png_{learning_rate}_{num_epochs}', dpi=300")
 
-# Define the best threshold for classification
-best_threshold = 0.5  # You can adjust this threshold based on your requirements
-with torch.no_grad():
-    for data, label in test_loader:
-        data = data.cuda()
-        recon = model(data)
-        y_score_batch = ((data - recon)**2).mean(axis=(1))[:, 0:-10, 0:-10].mean(axis=(1, 2)).cpu().numpy()
-        y_pred_batch = (y_score_batch >= best_threshold).astype(int)
-        y_true.extend(label.numpy().tolist())
-        y_pred.extend(y_pred_batch.tolist())
-        y_score.extend(y_score_batch.tolist())
+def plot_confusion_matrix(y_true, y_pred, learning_rate, num_epochs):
+    cm = confusion_matrix(y_true, y_pred)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['Normal', 'Defective'])
+    disp.plot()
+    plt.title('Confusion Matrix')
+    plt.savefig(f"confusion_matrix.png_{learning_rate}_{num_epochs}', dpi=300")
 
-y_true = np.array(y_true)
-y_pred = np.array(y_pred)
-y_score = np.array(y_score)
+def visualize_reconstructions(model, test_loader):
+    with torch.no_grad():
+        for data, _ in test_loader:
+            data = data.cuda()
+            recon = model(data)
+            break
+    recon_error = ((data - recon)**2).mean(axis=1)
+    vmax_global = torch.max(recon_error).item()
+    plt.figure(figsize=(15, 15))
+    fig, ax = plt.subplots(3, 3)
+    for i in range(3):
+        ax[0, i].imshow(data[i].cpu().numpy().transpose((1, 2, 0)))
+        ax[1, i].imshow(recon[i].cpu().numpy().transpose((1, 2, 0)))
+        ax[2, i].imshow(recon_error[i].cpu().numpy(), cmap='jet', vmax=vmax_global)
+        ax[0, i].axis('off')
+        ax[1, i].axis('off')
+        ax[2, i].axis('off')
+    plt.suptitle('Reconstructions: Original | Reconstructed | Error Map')
+    plt.savefig('reconstructions.png', dpi=300)
 
-# Evaluation metrics
-auc_roc_score = roc_auc_score(y_true, y_score)
-print(f"AUC-ROC Score: {auc_roc_score}")
+def main(learning_rate=1e-3, num_epochs=50):
+    print(f"Training with learning rate: {learning_rate}, num_epochs: {num_epochs}")
+    transform = get_transform()
+    BS = 16
+    train_dataset = CustomDataset(root_dir='dataset', mode='train', transform=transform)
+    train_loader = DataLoader(train_dataset, batch_size=BS, shuffle=True)
+    test_dataset = CustomDataset(root_dir='dataset', mode='test', transform=transform)
+    test_loader = DataLoader(test_dataset, batch_size=BS, shuffle=False)
 
-# Plot ROC curve
-fpr, tpr, thresholds = roc_curve(y_true, y_score)
-plt.figure()
-plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % auc_roc_score)
-plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('Receiver Operating Characteristic (ROC) Curve')
-plt.legend(loc="lower right")
-plt.show()
+    model = Autoencoder().cuda()
+    criterion = torch.nn.MSELoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
 
-# Visualize reconstructions
-with torch.no_grad():
-    for data, _ in test_loader:
-        data = data.cuda()
-        recon = model(data)
-        break
-recon_error =  ((data-recon)**2).mean(axis=1)
-plt.figure(dpi=250)
-fig, ax = plt.subplots(3, 3, figsize=(5*4, 4*4))
-for i in range(3):
-    ax[0, i].imshow(data[i].cpu().numpy().transpose((1, 2, 0)))
-    ax[1, i].imshow(recon[i].cpu().numpy().transpose((1, 2, 0)))
-    ax[2, i].imshow(recon_error[i][0:-10,0:-10].cpu().numpy(), cmap='jet',vmax= torch.max(recon_error[i]))
-    ax[0, i].axis('OFF')
-    ax[1, i].axis('OFF')
-    ax[2, i].axis('OFF')
-plt.show()
+    train_model(model, train_loader, criterion, optimizer, scheduler, num_epochs=num_epochs)
+
+    y_true, y_pred, y_score = evaluate_model(model, test_loader)
+
+    auc_roc_score = roc_auc_score(y_true, y_score)
+    precision = precision_score(y_true, y_pred)
+    recall = recall_score(y_true, y_pred)
+    f1 = f1_score(y_true, y_pred)
+    print(f"AUC-ROC Score: {auc_roc_score:.4f}")
+    print(f"Precision: {precision:.4f}")
+    print(f"Recall: {recall:.4f}")
+    print(f"F1 Score: {f1:.4f}")
+
+    plot_roc_curve(y_true, y_score, auc_roc_score, learning_rate, num_epochs)
+    plot_confusion_matrix(y_true, y_pred, learning_rate, num_epochs)
+    visualize_reconstructions(model, test_loader)
+
+if __name__ == "__main__":
+    print(f"Using device: {torch.cuda.get_device_name(0)}")
+    main(0.01, 50)
+    main(0.001, 50)
+    main(0.0001, 50)
+    
