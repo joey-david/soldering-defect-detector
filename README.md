@@ -2,31 +2,27 @@
 
 This repository uses [anomalib](https://github.com/openvinotoolkit/anomalib) to detect soldering issues.
 
-## Included Virtual Environment
-
-The `.venv` directory is included to simplify usage. This allows for immediate setup without additional configuration.
-Anomalib is already installed in the venv: run 
-```python
-source .venv/bin/activate
-```
-before running the detection phase.
-
 ## Getting Started
 
 Clone the repository and activate the virtual environment:
 
 ```bash
-git clone https://github.com/yourusername/yourproject.git
-cd yourproject
+git clone https://forge.univ-lyon1.fr/p2115771/ouverture_recherche_2024.git
+cd ouverture_recherche_2024
+python3 -m venv .venv
 source .venv/bin/activate
 ```
+# Installing requirements
 
-## Usage
+run ```pip install -r requirements.txt``` prior to running any module. It contains a specific list of version requirements, as anomalib is incompatible with a lot of recent libraries.
 
-Run the anomaly detection script:
+
+## Extracting dataset
+
+Run the dataset extraction and classification from the root of the project :
 
 ```bash
-python3 detect_anomalies.py
+python3 prepare_dataset.py
 ```
 
 ## About
