@@ -1,0 +1,34 @@
+dataset:
+  name: solder_defect
+  format: folder
+  path: ./dataset
+  train_path: ./dataset/train
+  val_path: ./dataset/val
+  normal_dir: Sans_Defaut
+  abnormal_dir: Defaut
+  task: classification
+  split_ratio: 0.2
+  seed: 42
+  image_size: 256
+  train_batch_size: 32
+  test_batch_size: 32
+  num_workers: 8
+  transform_config:
+    train: null
+    val: null
+  create_validation_set: true
+  tiling:
+    apply: false
+    tile_size: null
+    stride: null
+    remove_border_count: 0
+    use_random_tiling: False
+    random_tile_count: 16
+
+model:
+  name: stfpm
+  backbone: resnet18
+
+trainer:
+  max_epochs: 50
+  gpus: 1

@@ -2,32 +2,68 @@ import os
 import shutil
 import re
 import zipfile
+import random
 
-if os.path.exists("DATASET_Sujet2"):
-    os.rename("DATASET_Sujet2", "dataset")
+def extractAndOrder(binary=False):
+    # Create dataset directory if it doesn't exist
+    dataset_dir = "dataset"
+    if not os.path.exists(dataset_dir):
+        os.makedirs(dataset_dir)
 
-zip_files = ['Defaut.zip', 'Sans_Defaut.zip']
+    # List of zip files to extract
+    zip_files = ["Defaut.zip", "Sans_Defaut.zip"]
 
-# Unzip the files to the dataset path
-for zip_file in zip_files:
-    zip_path = os.path.join('./dataset', zip_file)  # Create full path to zip file
-    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        zip_ref.extractall('./dataset')
+    # Extract each zip file into the dataset directory
+    for zip_file in zip_files:
+        with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+            zip_ref.extractall(dataset_dir)
+    
+    # Split the contents of the Sans_Defaut subdirectory into training and testing sets
+    sans_defaut_dir = os.path.join(dataset_dir, "Sans_Defaut")
+    os.makedirs(os.path.join(dataset_dir, "train", "Sans_Defaut"))
+    os.makedirs(os.path.join(dataset_dir, "val", "Sans_Defaut"))
 
-# Create a regex pattern to match the file naming format
-pattern = re.compile(r'image_(\d+)_(.+)\.png')
+    for file in os.listdir(sans_defaut_dir):
+        if random.random() < 0.2:
+            shutil.move(os.path.join(sans_defaut_dir, file), os.path.join(dataset_dir, "val", "Sans_Defaut"))
+        else:
+            shutil.move(os.path.join(sans_defaut_dir, file), os.path.join(dataset_dir, "train", "Sans_Defaut"))
 
-# Get the list of files in the dataset directory
-files = os.listdir('./dataset/Defaut')
+    # Extract default names from the Defaut subdirectory and move to corresponding directories
+    defaut_dir = os.path.join(dataset_dir, "Defaut")
+    os.makedirs(os.path.join(dataset_dir, "train", "Defaut"))
+    os.makedirs(os.path.join(dataset_dir, "val", "Defaut"))
 
-# Loop through the files and move them to the appropriate folder
-for file in files:
-    if file not in zip_files:  # Skip the zip files themselves
-        match = pattern.match(file)
-        if match:
-            folder_name = os.path.join('./dataset/Defaut', match.group(2))
-            if not os.path.exists(folder_name):
-                os.makedirs(folder_name)
-            shutil.move(os.path.join('./dataset/Defaut', file), os.path.join(folder_name, file))
+    if binary:
+        for file in os.listdir(defaut_dir):
+            if random.random() < 0.2:
+                shutil.move(os.path.join(defaut_dir, file), os.path.join(dataset_dir, "val", "Defaut"))
+            else:
+                shutil.move(os.path.join(defaut_dir, file), os.path.join(dataset_dir, "train", "Defaut"))
+        
 
-print("Files extracted and organized successfully")
+    else:
+        pattern = re.compile(r'image_\d+_(\w+).png')
+        defauts = ["SL", "ST_Inf", "ST_Sup", "STP", "ST_Sup_Pli"]
+        for defaut in defauts:
+            os.makedirs(os.path.join(dataset_dir, "train", "Defaut", defaut))
+            os.makedirs(os.path.join(dataset_dir, "val", "Defaut", defaut))
+
+        for file in os.listdir(defaut_dir):
+            match = pattern.match(file)
+            if match:
+                defaut = match.group(1)
+                if random.random() < 0.2:
+                    shutil.move(os.path.join(defaut_dir, file), os.path.join(dataset_dir, "val", "Defaut", defaut))
+                else:
+                    shutil.move(os.path.join(defaut_dir, file), os.path.join(dataset_dir, "train", "Defaut", defaut))
+
+
+
+if __name__ == "__main__":
+    if os.path.exists("dataset"):
+        shutil.rmtree("dataset")
+    extractAndOrder(False)
+    shutil.rmtree("dataset/Defaut")
+    shutil.rmtree("dataset/Sans_Defaut")
+    print("Dataset prepared and extracted.")
