@@ -1,3 +1,5 @@
 .venv
 dataset/**/
+dataset_multi/**/
 results/
+model.pth
