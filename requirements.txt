@@ -2,3 +2,4 @@ anomalib[full]
 numpy<2.0.0
 ollama<0.4
 flask
+matplotlib==3.5.3

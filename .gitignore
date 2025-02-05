@@ -1,5 +1,4 @@
 .venv
-dataset/**/
-dataset_multi/**/
+data/data*
 results/
-model.pth
+*.pth
