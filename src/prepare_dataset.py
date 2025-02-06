@@ -5,13 +5,13 @@ import zipfile
 
 def extractAndOrder(binary=False):
     # Create dataset directory
-    dataset_dir = "dataset" if binary else "dataset_multi"
+    dataset_dir = "data/dataset" if binary else "data/dataset_multi"
     if os.path.exists(dataset_dir):
         shutil.rmtree(dataset_dir)
     os.makedirs(dataset_dir)
 
     # Extract zip files
-    for zip_file in ["Defaut.zip", "Sans_Defaut.zip"]:
+    for zip_file in ["data/raw/Defaut.zip", "data/raw/Sans_Defaut.zip"]:
         with zipfile.ZipFile(zip_file, 'r') as zip_ref:
             zip_ref.extractall(dataset_dir)
 
