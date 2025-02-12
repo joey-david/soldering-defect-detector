@@ -15,7 +15,7 @@ modeToggle.addEventListener('change', function() {
 // Update prepareDataset function
 async function prepareDataset() {
     try {
-        const response = await fetch('/api/prepare-dataset', {
+        const response = await fetch('http://127.0.0.1:5000/api/prepare-dataset', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -92,29 +92,19 @@ alert('Évaluation du modèle...');
 
 async function prepareDataset() {
     try {
-        const response = await fetch('/api/prepare-dataset', {
+        const response = await fetch('http://127.0.0.1:5000/api/prepare-dataset', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ binary: true })
         });
-        const data = await response.json();
+        const text = await response.text();
+        console.log('Raw response:', text);
+        const data = JSON.parse(text);
         alert(data.message);
     } catch (error) {
         alert('Error preparing dataset: ' + error.message);
-    }
-}
-
-async function trainModel() {
-    try {
-        const response = await fetch('/api/train', {
-            method: 'POST'
-        });
-        const data = await response.json();
-        alert(data.message);
-    } catch (error) {
-        alert('Error training model: ' + error.message);
     }
 }
 
@@ -135,7 +125,7 @@ document.querySelector('form').onsubmit = async (e) => {
     formData.append('file', fileInput.files[0]);
     
     try {
-        const response = await fetch('/api/predict', {
+        const response = await fetch('http://127.0.0.1:5000/api/predict', {
             method: 'POST',
             body: formData
         });

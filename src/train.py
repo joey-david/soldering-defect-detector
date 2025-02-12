@@ -16,18 +16,18 @@ def initialize_datamodule(dataset_root):
         normal_split_ratio=0.2,
         val_split_mode="from_test",
         val_split_ratio=0.5,
-        image_size=(32, 32),
-        train_batch_size=4,
-        eval_batch_size=4,
+        image_size=(200, 200),
+        train_batch_size=2,
+        eval_batch_size=2,
         task="classification",
         num_workers=4
     )
 
 def initialize_model():
     return Patchcore(
-        backbone="resnet18",
+        backbone="resnet34",
         layers=["layer2", "layer3"],
-        coreset_sampling_ratio=0.001
+        coreset_sampling_ratio=0.1
     )
 
 def initialize_engine():
@@ -41,14 +41,14 @@ def initialize_engine():
 def train_model(engine, datamodule, model):
     torch.cuda.empty_cache()
     engine.fit(datamodule=datamodule, model=model)
-    torch.save(model, 'model2.pth')
+    torch.save(model, 'model_multi.pth')
 
 def main(binary=True):
-    dataset_root = "dataset" if binary else "dataset_multi"
+    dataset_root = "data/dataset" if binary else "data/dataset_multi"
     datamodule = initialize_datamodule(dataset_root)
     model = initialize_model()
     engine = initialize_engine()
     train_model(engine, datamodule, model)
 
 if __name__ == "__main__":
-    main()
+    main(False)

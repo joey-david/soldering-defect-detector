@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, send_file, send_from_directory
+from flask_cors import CORS
 from prepare_dataset import extractAndOrder
 from train import main
 from pathlib import Path
@@ -19,6 +20,8 @@ app = Flask(__name__,
     template_folder='../templates'
 )
 
+CORS(app)
+
 @app.route('/')
 def home():
     return send_file('../templates/index.html')
@@ -32,35 +35,18 @@ def initialize_model(model_path):
     return model, Engine()
 
 # Initialize both models at startup
-binary_model, binary_engine = initialize_model('./models/model.pth')
-multi_model, multi_engine = initialize_model('./models/model.pth')
+binary_model, binary_engine = initialize_model('./models/model_bin.pth')
+#multi_model, multi_engine = initialize_model('./models/model_bin.pth')
 
 @app.route('/api/prepare-dataset', methods=['POST'])
 def prepare_dataset():
     try:
-        binary = request.json.get('binary', True)
+        binary = bool(request.json.get('binary', True))
         extractAndOrder(binary)
         return jsonify({"status": "success", "message": "Dataset prepared successfully"}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-@app.route('/api/train', methods=['POST'])
-def train():
-    try:
-        main()
-        return jsonify({"status": "success", "message": "Model trained successfully"})
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
-
-def generate_heatmap(anomaly_map):
-    """Convert anomaly map to base64 encoded image"""
-    anomaly_map = anomaly_map.squeeze().cpu().numpy()
-    normalized_map = (anomaly_map - anomaly_map.min()) / (anomaly_map.max() - anomaly_map.min()) * 255
-    img = Image.fromarray(normalized_map.astype(np.uint8))
-    img = img.resize((256, 256))  # Resize to match input size
-    buffered = BytesIO()
-    img.save(buffered, format="PNG")
-    return base64.b64encode(buffered.getvalue()).decode('utf-8')
 
 @app.route('/api/predict', methods=['POST'])
 def predict():
@@ -68,14 +54,17 @@ def predict():
         return jsonify({"status": "error", "message": "No file provided"}), 400
     
     file = request.files['file']
-    mode = request.form.get('mode', 'binary')  # Get classification mode
-    
+    try:
+        binary = bool(request.json.get('binary', True))
+    except Exception as e:
+        return jsonify({"status": "error", "message": "Error while getting binary status"}), 400
+
     # Select appropriate model and engine
-    model = binary_model if mode == 'binary' else multi_model
-    engine = binary_engine if mode == 'binary' else multi_engine
+    model = binary_model if binary else binary_model # TODO
+    engine = binary_engine if binary else binary_engine # TODO
     
     try:
-        temp_path = "temp.png"
+        temp_path = "data/temp.png"
         file.save(temp_path)
         
         # Create dataset and predict
