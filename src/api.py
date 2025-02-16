@@ -5,12 +5,14 @@ from train import main
 from pathlib import Path
 from anomalib.data import PredictDataset
 from anomalib.engine import Engine
+from anomalib.models.image.cfa.anomaly_map import AnomalyMapGenerator
 import torch
 import os
 import base64
 import numpy as np
 from io import BytesIO
 from PIL import Image
+import matplotlib.pyplot as plt
 
 from flask import Flask, request, jsonify, send_file, send_from_directory
 torch.cuda.empty_cache()
@@ -47,6 +49,20 @@ def prepare_dataset():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+def convert_heatmap_to_base64(anomaly_map):
+    """Converts an anomaly heatmap into a base64 encoded image."""
+    plt.figure(figsize=(4, 4))
+    plt.imshow(anomaly_map, cmap='jet')
+    plt.axis('off')
+
+    buf = BytesIO()
+    plt.savefig(buf, format="png", bbox_inches='tight', pad_inches=0)
+    plt.close()
+
+    buf.seek(0)
+    base64_img = base64.b64encode(buf.getvalue()).decode('utf-8')
+    return f"data:image/png;base64,{base64_img}"
+
 
 @app.route('/api/predict', methods=['POST'])
 def predict():
@@ -54,14 +70,10 @@ def predict():
         return jsonify({"status": "error", "message": "No file provided"}), 400
     
     file = request.files['file']
-    try:
-        binary = bool(request.json.get('binary', True))
-    except Exception as e:
-        return jsonify({"status": "error", "message": "Error while getting binary status"}), 400
 
     # Select appropriate model and engine
-    model = binary_model if binary else binary_model # TODO
-    engine = binary_engine if binary else binary_engine # TODO
+    model = binary_model
+    engine = binary_engine
     
     try:
         temp_path = "data/temp.png"
@@ -84,11 +96,22 @@ def predict():
             return jsonify({"status": "error", "message": "No predictions generated"}), 500
 
         prediction = predictions[0]
-        
+
+                # Extract anomaly score map if available
+        if "anomaly_maps" in prediction:
+            anomaly_map = prediction["anomaly_maps"].squeeze().cpu().numpy()
+        elif "distance" in prediction:  # Alternative key based on your previous error
+            anomaly_map = prediction["distance"].squeeze().cpu().numpy()
+        else:
+            return jsonify({"status": "error", "message": "Anomaly map not found in prediction"}), 500
+
+        # Convert the anomaly map to a base64 heatmap
+        heatmap_img = convert_heatmap_to_base64(anomaly_map)
+
         result = {
             "label": "Anomaly" if prediction["pred_labels"].item() else "Normal",
             "confidence": round(prediction["pred_scores"].item(), 4),
-            "heatmap": generate_heatmap(prediction["anomaly_maps"])
+            "heatmap": heatmap_img
         }
 
         return jsonify({"status": "success", "result": result})

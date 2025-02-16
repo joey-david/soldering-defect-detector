@@ -17,7 +17,7 @@
         <button class="action-button" onclick="prepareDataset()">Préparer le Dataset</button>
       </div>
       
-      <form method="POST" action="/predict" enctype="multipart/form-data">
+      <form id="upload-form" enctype="multipart/form-data">
         <div class="upload-section" id="drop-zone">
           <input type="file" id="image" name="file" accept="image/*" hidden />
           <label for="image" class="custom-upload">
@@ -32,7 +32,7 @@
         <img id="preview" alt="Aperçu de l'image" />
         <div id="error-msg">Veuillez téléverser une image valide</div>
 
-        <button type="submit">Analyser la Soudure</button>
+        <button id="send" type="button">Analyser la Soudure</button>
       </form>
     </div>
 

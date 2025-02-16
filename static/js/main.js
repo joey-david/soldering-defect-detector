@@ -4,13 +4,7 @@ function toggleTheme() {
     body.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
   }
-
-const modeToggle = document.getElementById('mode-toggle');
 const modeLabel = document.getElementById('mode-label');
-
-modeToggle.addEventListener('change', function() {
-    modeLabel.textContent = `Mode: ${this.checked ? 'Multi' : 'Binary'}`;
-});
 
 // Update prepareDataset function
 async function prepareDataset() {
@@ -109,7 +103,7 @@ async function prepareDataset() {
 }
 
 // Update form submission
-document.querySelector('form').onsubmit = async (e) => {
+document.querySelector('#send').onclick = async (e) => {
     e.preventDefault();
     const loadingOverlay = document.getElementById('loading-overlay');
     const resultSection = document.getElementById('result-section');
@@ -123,21 +117,25 @@ document.querySelector('form').onsubmit = async (e) => {
 
     const formData = new FormData();
     formData.append('file', fileInput.files[0]);
-    
+
     try {
         const response = await fetch('http://127.0.0.1:5000/api/predict', {
             method: 'POST',
             body: formData
         });
         const data = await response.json();
-        
+    
         loadingOverlay.style.display = 'none';
 
         if (data.status === 'success') {
             resultLabel.textContent = data.result.label;
-            resultConfidence.textContent = `${(data.result.confidence * 100).toFixed(1)}%`;
-            confidenceFill.style.width = `${data.result.confidence * 100}%`;
-            heatmapImg.src = `data:image/png;base64,${data.result.heatmap}`;
+            confidence = data.result.confidence;
+            if (confidence < 0.5) {
+                confidence = 1 - confidence;
+            }
+            resultConfidence.textContent = `${(confidence * 100).toFixed(1)}%`;
+            confidenceFill.style.width = `${confidence * 100}%`;
+            heatmapImg.src = data.result.heatmap;
             resultSection.style.display = 'block';
         } else {
             showError(data.message);

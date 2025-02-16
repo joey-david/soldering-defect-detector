@@ -122,7 +122,7 @@
     color: var(--text);
   }
 
-  button[type="submit"], .action-button {
+  #send, .action-button {
     background: var(--success);
     color: white;
     padding: 15px 40px;
