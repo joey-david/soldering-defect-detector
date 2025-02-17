@@ -110,7 +110,7 @@
   }
 
   #preview {
-    max-width: 300px;
+    max-width: 500px;
     margin: 2rem auto;
     border-radius: 10px;
     display: none;
@@ -152,22 +152,22 @@
     border-radius: 15px;
     background: rgba(52, 152, 219, 0);
     display: none;
-    width: 500px;
-    align-self: center;
+    width: 100%; /* Change from 500px to 100% */
+    align-self: stretch; /* Change from center to stretch */
   }
 
   .result-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 2rem;
     margin-top: 1.5rem;
+    width: 100%;
   }
 
   .result-item {
-    background: var(--background);
+    background: rgba(34, 34, 34, 0.3);
     padding: 1.5rem;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   }
 
   .confidence-meter {

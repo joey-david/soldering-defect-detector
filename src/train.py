@@ -14,7 +14,7 @@ def initialize_datamodule(dataset_root):
         abnormal_dir="Defaut",
         val_split_mode="from_test",
         val_split_ratio=0.2, # 20% of test data
-        image_size=(50, 50),
+        image_size=(200, 200),
         train_batch_size=2,
         eval_batch_size=2,
         task="classification",
