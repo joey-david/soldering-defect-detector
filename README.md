@@ -17,7 +17,7 @@ source .venv/bin/activate
 ```
 # Installing requirements
 
-run ```pip install -r requirements.txt``` prior to running any module. It contains a specific list of version requirements, as anomalib is incompatible with a lot of recent libraries.
+Run ```pip install -r requirements.txt``` prior to running any module. It contains a specific list of version requirements, as anomalib is incompatible with a lot of recent libraries.
 
 
 ## Extracting dataset

@@ -97,7 +97,7 @@ def predict():
 
         prediction = predictions[0]
 
-                # Extract anomaly score map if available
+            # Extract anomaly score map if available
         if "anomaly_maps" in prediction:
             anomaly_map = prediction["anomaly_maps"].squeeze().cpu().numpy()
         elif "distance" in prediction:  # Alternative key based on your previous error

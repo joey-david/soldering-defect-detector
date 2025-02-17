@@ -34,26 +34,26 @@
 
         <button id="send" type="button">Analyser la Soudure</button>
       </form>
-    </div>
-
-    <div class="result-section" id="result-section">
-      <h2>📊 Résultats de l'Analyse</h2>
-      <div class="result-grid">
-        <div class="result-item">
-          <h3>Statut</h3>
-          <div id="result-label" class="result-value">-</div>
-        </div>
-        <div class="result-item">
-          <h3>Confiance</h3>
-          <div id="result-confidence" class="result-value">-</div>
-          <div class="confidence-meter">
-            <div class="confidence-fill" id="confidence-fill"></div>
+      <div class="result-section" id="result-section">
+        <h2>📊 Résultats de l'Analyse</h2>
+        <div class="result-grid">
+          <div class="result-item">
+            <h3>Statut</h3>
+            <div id="result-label" class="result-value">-</div>
+          </div>
+          <div class="result-item">
+            <h3>Confiance</h3>
+            <div id="result-confidence" class="result-value">-</div>
+            <div class="confidence-meter">
+              <div class="confidence-fill" id="confidence-fill"></div>
+            </div>
           </div>
         </div>
+        <h3 style="margin-top: 2rem;">Carte Thermique des Anomalies</h3>
+        <img id="heatmap" alt="Carte thermique" style="max-width: 400px; margin-top: 1rem; border-radius: 8px;"/>
       </div>
-      <h3 style="margin-top: 2rem;">Carte Thermique des Anomalies</h3>
-      <img id="heatmap" alt="Carte thermique" style="max-width: 400px; margin-top: 1rem; border-radius: 8px;"/>
     </div>
+
   </div>
 
   <div class="loading-overlay" id="loading-overlay">

@@ -142,6 +142,7 @@ document.querySelector('#send').onclick = async (e) => {
         }
     } catch (error) {
         loadingOverlay.style.display = 'none';
+        console.log('Error:', error);
         showError('Erreur de connexion au serveur');
     }
 };

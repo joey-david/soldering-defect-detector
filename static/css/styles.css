@@ -150,8 +150,10 @@
     margin-top: 2rem;
     padding: 1.5rem;
     border-radius: 15px;
-    background: rgba(52, 152, 219, 0.1);
+    background: rgba(52, 152, 219, 0);
     display: none;
+    width: 500px;
+    align-self: center;
   }
 
   .result-grid {
@@ -276,7 +278,7 @@
     100% { transform: rotate(360deg); }
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 1000px) {
     .container {
       padding: 2rem 1rem;
     }
