@@ -9,7 +9,7 @@ from anomalib.engine import Engine
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score
 
 
-def test_dataset(model, engine, dataset_path):
+def test_dataset(model, engine, dataset_path, results_dir="results"):
     # Collect stats
     all_times = []
     all_labels = []
@@ -86,7 +86,7 @@ def test_dataset(model, engine, dataset_path):
 
     # Plot inference times
     plt.figure(figsize=(6,4))
-    plt.plot(all_times, marker='o')
+    plt.plot(all_times)
     plt.title("Inference Time per Sample")
     plt.xlabel("Sample Index")
     plt.ylabel("Time (seconds)")
