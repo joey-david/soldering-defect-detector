@@ -20,14 +20,12 @@ def test_dataset(model, engine, dataset_path, results_dir="results"):
     total_images = sum(1 for _ in Path(dataset_path).rglob("*.png"))
 
     for image_path in Path(dataset_path).rglob("*.png"):
-        start = time.time()
+        start = time.monotonic()
         batch_preds = engine.predict(
             model=model,
             dataset=PredictDataset(path=image_path)
         )
-        elapsed = time.time() - start
-        if elapsed < 0:
-            elapsed = all_times[-1] if all_times else 0
+        elapsed = time.monotonic() - start
         all_times.append(elapsed)
 
         # Derive label from folder structure
