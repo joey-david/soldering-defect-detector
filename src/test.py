@@ -26,6 +26,8 @@ def test_dataset(model, engine, dataset_path, results_dir="results"):
             dataset=PredictDataset(path=image_path)
         )
         elapsed = time.time() - start
+        if elapsed < 0:
+            elapsed = all_times[-1] if all_times else 0
         all_times.append(elapsed)
 
         # Derive label from folder structure
