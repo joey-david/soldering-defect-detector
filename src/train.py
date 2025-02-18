@@ -30,7 +30,7 @@ def initialize_model():
 
 def initialize_engine():
     return Engine(
-        max_epochs=50,
+        max_epochs=2, # don't need more since patchcore only samples once
         devices="cuda:0", # force gpu usage
         pixel_metrics=["AUROC"],
         task="classification",

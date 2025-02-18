@@ -1,92 +1,102 @@
+import time
 import torch
+from api import initialize_model
+import matplotlib.pyplot as plt
+import seaborn as sns
 from pathlib import Path
 from anomalib.data import PredictDataset
 from anomalib.engine import Engine
-from sklearn.metrics import confusion_matrix, roc_curve, auc, classification_report
-import matplotlib.pyplot as plt
-import numpy as np
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score
 
-torch.cuda.empty_cache()
 
-# Defect type mapping
-DEFECT_TYPES = {
-    0: "Sans_Defaut",
-    1: "SL",
-    2: "ST_Inf", 
-    3: "ST_Sup",
-    4: "ST_Sup_Pli",
-    5: "STP"
-}
+def test_dataset(model, engine, dataset_path):
+    # Collect stats
+    all_times = []
+    all_labels = []
+    all_preds = []
+    anomaly_map_sum = None
+    count = 0
+    # count all images in the folder and its subfolders
+    total_images = sum(1 for _ in Path(dataset_path).rglob("*.png"))
 
-# Load the saved model
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = torch.load('models/model_bin.pth', map_location=device, weights_only=False)
-model.eval()
-model.to(device)
+    for image_path in Path(dataset_path).rglob("*.png"):
+        start = time.time()
+        batch_preds = engine.predict(
+            model=model,
+            dataset=PredictDataset(path=image_path)
+        )
+        elapsed = time.time() - start
+        all_times.append(elapsed)
 
-# Initialize the engine (handles device automatically)
-engine = Engine()
+        # Derive label from folder structure
+        # 0 = Sans_Defaut, else = Defaut
+        label = 0 if "Sans_Defaut" in str(image_path) else 1
+        if not batch_preds:
+            continue
 
-# Path to your test dataset
-dataset_path = Path("data/dataset/")
+        prediction = batch_preds[0]
+        pred_label = prediction["pred_labels"].item()
+        all_labels.append(label)
+        all_preds.append(pred_label)
 
-# Create dataset for all images
-dataset = PredictDataset(
-    path=dataset_path,
-    image_size=(256, 256),  # Must match training size
-)
+        # Accumulate anomaly map for averaging
+        if "anomaly_maps" in prediction:
+            anomaly_map = prediction["anomaly_maps"].squeeze().cpu().numpy()
+        elif "distance" in prediction:
+            anomaly_map = prediction["distance"].squeeze().cpu().numpy()
+        else:
+            continue
 
-# Collect predictions and ground truth labels
-all_preds = []
-all_labels = []
+        if anomaly_map_sum is None:
+            anomaly_map_sum = anomaly_map
+        else:
+            anomaly_map_sum += anomaly_map
+        count += 1
+        print(f"{round(100*count / total_images,2)}% done")
 
-for image_path in dataset_path.glob("**/*.png"):
-    dataset = PredictDataset(
-        path=image_path,
-        image_size=(256, 256),  # Must match training size
-    )
-    predictions = engine.predict(
-        model=model,
-        dataset=dataset,
-    )
-    if predictions:
-        prediction = predictions[0]  # Assuming predictions is a list with one element
-        pred_class = prediction["pred_labels"].item()
-        true_class = int(image_path.parent.name.split('_')[0])  # Assuming folder name contains the true class
+    # Compute metrics
+    cm = confusion_matrix(all_labels, all_preds)
+    acc = accuracy_score(all_labels, all_preds)
+    prec = precision_score(all_labels, all_preds)
+    rec = recall_score(all_labels, all_preds)
 
-        all_preds.append(pred_class)
-        all_labels.append(true_class)
+    print(f"Accuracy:  {acc:.4f}")
+    print(f"Precision: {prec:.4f}")
+    print(f"Recall:    {rec:.4f}")
+    print("Confusion Matrix:\n", cm)
 
-# Compute confusion matrix
-conf_matrix = confusion_matrix(all_labels, all_preds)
-print("Confusion Matrix:")
-print(conf_matrix)
+    # Plot confusion matrix
+    plt.figure(figsize=(5,4))
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", 
+                xticklabels=["Sans_Defaut","Defaut"], 
+                yticklabels=["Sans_Defaut","Defaut"])
+    plt.title("Confusion Matrix")
+    plt.savefig("confusion_matrix.png")
+    plt.close()
 
-# Compute ROC curve and AUC for each class
-fpr = dict()
-tpr = dict()
-roc_auc = dict()
-n_classes = len(DEFECT_TYPES)
-all_labels_one_hot = np.eye(n_classes)[all_labels]
-all_preds_one_hot = np.eye(n_classes)[all_preds]
+    # Plot average anomaly map
+    if anomaly_map_sum is not None and count > 0:
+        avg_map = anomaly_map_sum / count
+        plt.figure(figsize=(4,4))
+        plt.imshow(avg_map, cmap='jet')
+        plt.title("Average Anomaly Map")
+        plt.axis('off')
+        plt.savefig("average_anomaly_map.png")
+        plt.close()
 
-for i in range(n_classes):
-    fpr[i], tpr[i], _ = roc_curve(all_labels_one_hot[:, i], all_preds_one_hot[:, i])
-    roc_auc[i] = auc(fpr[i], tpr[i])
+    # Plot inference times
+    plt.figure(figsize=(6,4))
+    plt.plot(all_times, marker='o')
+    plt.title("Inference Time per Sample")
+    plt.xlabel("Sample Index")
+    plt.ylabel("Time (seconds)")
+    plt.savefig("inference_time.png")
+    plt.close()
 
-# Plot ROC curve
-plt.figure()
-for i in range(n_classes):
-    plt.plot(fpr[i], tpr[i], label=f'ROC curve of class {DEFECT_TYPES[i]} (area = {roc_auc[i]:.2f})')
-plt.plot([0, 1], [0, 1], 'k--')
-plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('Receiver Operating Characteristic')
-plt.legend(loc="lower right")
-plt.show()
+def main():
+    binary_model, binary_engine = initialize_model('./models/model_bin.pth')
+    dataset_path = "data/dataset"
+    test_dataset(binary_model, binary_engine, dataset_path)
 
-# Print classification report
-print("Classification Report:")
-print(classification_report(all_labels, all_preds, target_names=list(DEFECT_TYPES.values())))
+if __name__ == "__main__":
+    main()

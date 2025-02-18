@@ -4,3 +4,4 @@ ollama<0.4
 flask
 flask-cors
 matplotlib==3.5.3
+seaborn
