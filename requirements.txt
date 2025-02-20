@@ -2,3 +2,6 @@ anomalib[full]
 numpy<2.0.0
 ollama<0.4
 flask<3.1.0
+flask-cors
+matplotlib==3.5.3
+seaborn

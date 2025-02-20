@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inspection de Soudures par IA | Anomalie Soudure</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+  </head>
+  <body data-theme="light">
+    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+    
+    <div class="container">
+      <h1>🔍 Système d'Inspection de Soudure par IA</h1>
+      <p class="instruction">Téléversez une image de soudure pour une analyse instantanée</p>
+
+      <div class="action-buttons">
+        <button class="action-button" onclick="prepareDataset()">Préparer le Dataset</button>
+      </div>
+      
+      <form id="upload-form" enctype="multipart/form-data">
+        <div class="upload-section" id="drop-zone">
+          <input type="file" id="image" name="file" accept="image/*" hidden />
+          <label for="image" class="custom-upload">
+            📁 Choisir un fichier
+          </label>
+          <div id="file-name">Aucun fichier sélectionné</div>
+          <div class="instruction" style="margin-top: 1rem;">
+            ou glissez-déposez l'image ici
+          </div>
+        </div>
+
+        <img id="preview" alt="Aperçu de l'image" />
+        <div id="error-msg">Veuillez téléverser une image valide</div>
+
+        <button id="send" type="button">Analyser la Soudure</button>
+      </form>
+      <div class="result-section" id="result-section">
+        <h2>📊 Résultats de l'Analyse</h2>
+        <div class="result-grid">
+          <div class="result-item">
+            <h3>Statut</h3>
+            <div id="result-label" class="result-value">-</div>
+          </div>
+          <div class="result-item">
+            <h3>Confiance</h3>
+            <div id="result-confidence" class="result-value">-</div>
+            <div class="confidence-meter">
+              <div class="confidence-fill" id="confidence-fill"></div>
+            </div>
+          </div>
+        </div>
+        <h3 style="margin-top: 2rem;">Carte Thermique des Anomalies</h3>
+        <img id="heatmap" alt="Carte thermique" style="max-width: 400px; margin-top: 1rem; border-radius: 8px;"/>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+
+  <script src="/static/js/main.js"></script>
+
+  </body>
+</html>
